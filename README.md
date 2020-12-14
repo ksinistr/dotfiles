@@ -4,6 +4,10 @@
 * [Neovim](https://neovim.io/)
 * [Silver Searcher (ag)](https://github.com/ggreer/the_silver_searcher)
 ## Step by step configuration
+#### 0. Install nodejs >= 10.12 for Coc.nvim plugin:
+```bash
+curl -sL install-node.now.sh/lts | bash
+```
 #### 1. Clone this repo to `~/dotfiles`
 ```bash
 git clone https://github.com/sun604/dotfiles ~/dotfiles
