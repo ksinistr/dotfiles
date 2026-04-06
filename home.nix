@@ -87,6 +87,7 @@ lib.mkMerge [
         la = "eza -a";
         ll = "eza -lah";
         ls = "eza --color=auto";
+        s = "kitten ssh";
       };
 
       initContent = ''
@@ -312,6 +313,7 @@ lib.mkMerge [
       "kitty/kitty.conf".text = ''
         font_family family="${terminalFontName}"
         font_size ${toString terminalFontSize}
+        paste_actions no-op
         background_opacity 1.0
         confirm_os_window_close 0
         copy_on_select clipboard
