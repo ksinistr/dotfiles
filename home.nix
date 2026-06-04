@@ -17,37 +17,40 @@ let
 
   # Overlay for custom Go packages
   go-overlay = self: super: {
-    go_1_24 = unstablePkgs.go_1_24;
-    golangci-lint_1_63_4 = super.buildGoModule {
-      pname = "golangci-lint";
-      version = "1.63.4";
-
-      src = super.fetchFromGitHub {
-        owner = "golangci";
-        repo = "golangci-lint";
-        rev = "v${self.golangci-lint_1_63_4.version}";
-        hash = "sha256-7nIo6Nuz8KLuQlT7btjnTRFpOl+KVd30v973HRKzh08=";
+    go_1_25 = unstablePkgs.go_1_25;
+    golangci-lint =
+      let
+        version = "2.5.0";
+        platform =
+          if super.stdenv.hostPlatform.system == "aarch64-darwin" then "darwin-arm64"
+          else if super.stdenv.hostPlatform.system == "x86_64-darwin" then "darwin-amd64"
+          else if super.stdenv.hostPlatform.system == "aarch64-linux" then "linux-arm64"
+          else "linux-amd64";
+        hashes = {
+          "darwin-arm64" = "sha256-Czy9wqJHL2C1OOvMsbLhrl2TigUcAQWRqmjG79NwZnI=";
+          "darwin-amd64" = "sha256-p+aEhysAY31kLQiN3ng8G4cRYakmePzxPQer5rXDLjY=";
+          "linux-arm64"  = "sha256-SGk6mKf0VW0RFzAKriQND+SD341vNt+rpWUEYmEBpm4=";
+          "linux-amd64"  = "sha256-x3MTp34ZsGEjlixBHZlDzA0JK77Ha5VhBNGJZOJ0kC4=";
+        };
+      in
+      super.stdenv.mkDerivation {
+        pname = "golangci-lint";
+        inherit version;
+        src = super.fetchurl {
+          url = "https://github.com/golangci/golangci-lint/releases/download/v${version}/golangci-lint-${version}-${platform}.tar.gz";
+          hash = hashes.${platform};
+        };
+        sourceRoot = "golangci-lint-${version}-${platform}";
+        installPhase = ''
+          mkdir -p $out/bin
+          cp golangci-lint $out/bin/
+        '';
+        meta = with super.lib; {
+          description = "Fast linters runner for Go";
+          homepage = "https://golangci-lint.run/";
+          license = licenses.gpl3Only;
+        };
       };
-
-      vendorHash = "sha256-atr4HMxoPEfGeaNlHqwTEAcvgbSyzgCe262VUg3J86c=";
-
-      subPackages = [ "." ];
-
-      ldflags = [
-        "-s"
-        "-w"
-        "-X main.version=${self.golangci-lint_1_63_4.version}"
-        "-X main.commit=unknown"
-        "-X main.date=unknown"
-      ];
-
-      meta = with super.lib; {
-        description = "Fast linters runner for Go";
-        homepage = "https://golangci-lint.run/";
-        license = licenses.gpl3Only;
-        maintainers = with maintainers; [ ];
-      };
-    };
   };
 
   # Apply the overlay
@@ -136,13 +139,13 @@ lib.mkMerge [
         bindkey "^A" vi-beginning-of-line
         bindkey "^E" vi-end-of-line
 
-        llm -s "respond with 3 choices that can be ran directly on command line, no formatting" --save cli
-        llm_cli(){
-            emulate -L zsh
-            zle -M "$(uvx --with llm-anthropic llm --key $ANTHROPIC_API_KEY -m claude-3.5-sonnet -t cli $BUFFER)"
-        }
-        zle -N llm_cli
-        bindkey '^[l' llm_cli   # ^[ is ESC, so Meta-l
+        # llm -s "respond with 3 choices that can be ran directly on command line, no formatting" --save cli
+        # llm_cli(){
+        #     emulate -L zsh
+        #     zle -M "$(uvx --with llm-anthropic llm --key $ANTHROPIC_API_KEY -m claude-3.5-sonnet -t cli $BUFFER)"
+        # }
+        # zle -N llm_cli
+        # bindkey '^[l' llm_cli   # ^[ is ESC, so Meta-l
         export PATH="$HOME/.local/bin:$PATH"
         export PATH="$HOME/.opencode/bin:$PATH"
       '';
@@ -233,7 +236,7 @@ lib.mkMerge [
         python311Packages.llm-anthropic
 
         # Node
-        nodejs
+        nodejs_24
         nodePackages.typescript
         nodePackages.typescript-language-server
         nodePackages.vscode-langservers-extracted
@@ -243,11 +246,14 @@ lib.mkMerge [
         nodePackages.prettier
 
         # Go and tools (some tools may be missing in 24.05)
-        (customPkgs.go_1_24)
-        (customPkgs.golangci-lint_1_63_4)
+        (customPkgs.go_1_25)
+        customPkgs.golangci-lint
+        (pkgs.golangci-lint-langserver.overrideAttrs { doCheck = false; })
         gopls
         gofumpt
-        # gci golines yamlfmt — check in your nixpkgs branch, can be added via nixpkgs-unstable overlay if needed
+        gci
+        golines
+        yamlfmt
 
         # Rust
         rustToolchain
@@ -287,12 +293,12 @@ lib.mkMerge [
     home.sessionPath = [ "${npmGlobal}/bin" ];
 
     # do the install with an explicit prefix so it never touches /nix/store
-    home.activation.installClaudeCode = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      mkdir -p "${npmGlobal}"
-      rm -rf "${npmGlobal}/lib/node_modules/@anthropic-ai/claude-code"
-      "${pkgs.nodejs}/bin/npm" --userconfig "$HOME/.npmrc" \
-        --prefix "${npmGlobal}" -g install @anthropic-ai/claude-code
-    '';
+    # home.activation.installClaudeCode = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    #   mkdir -p "${npmGlobal}"
+    #   rm -rf "${npmGlobal}/lib/node_modules/@anthropic-ai/claude-code"
+    #   "${pkgs.nodejs}/bin/npm" --userconfig "$HOME/.npmrc" \
+    #     --prefix "${npmGlobal}" -g install @anthropic-ai/claude-code
+    # '';
 
     ############################################
     # Configs (XDG)
@@ -409,7 +415,7 @@ lib.mkMerge [
     home.sessionVariables = {
       GOPATH = "${config.home.homeDirectory}/go";
       GOMODCACHE = "${config.home.homeDirectory}/go/pkg/mod";
-      GOROOT = "${customPkgs.go_1_24}/share/go";
+      GOROOT = "${customPkgs.go_1_25}/share/go";
       GOBIN = "${config.home.homeDirectory}/go/bin";
       GOCACHE = "${config.home.homeDirectory}/.cache/go-build";
 
@@ -427,7 +433,7 @@ lib.mkMerge [
     home.sessionVariables = {
       GOPATH = "$HOME/go";
       GOMODCACHE = "$HOME/Library/Caches/go/mod";
-      GOROOT = "${customPkgs.go_1_24}/share/go";
+      GOROOT = "${customPkgs.go_1_25}/share/go";
       GOBIN = "$HOME/go/bin";
       GOCACHE = "$HOME/Library/Caches/go-build";
       LD = "/usr/bin/ld";

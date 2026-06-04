@@ -63,7 +63,7 @@ local function gogci()
 			"-s",
 			"default",
 			"-s",
-			"'prefix(github.com/inDriver)'",
+			"prefix(github.com/inDriver)",
 			"-s",
 			"localmodule",
 			"--custom-order",
@@ -73,7 +73,7 @@ local function gogci()
 end
 
 local function goimports()
-	return { exe = "goimports", args = { "-local", "github.com/inDrive" }, stdin = true }
+	return { exe = "goimports", args = { "-local", "github.com/inDriver" }, stdin = true }
 end
 
 local function rustfmt()
@@ -97,6 +97,11 @@ end
 
 local function ocamlformat()
 	return { exe = "ocamlformat", stdin = true }
+end
+
+-- zig fmt ships with the zig toolchain
+local function zigfmt()
+	return { exe = "zig", args = { "fmt", "--stdin" }, stdin = true }
 end
 
 local function latexindent()
@@ -186,6 +191,7 @@ require("formatter").setup({
 		tex = { latexindent },
 		sql = { sleeksql },
 		sh = { shfmt },
+		zig = { zigfmt },
 	},
 })
 

@@ -25,6 +25,7 @@ local ensure_installed = {
 	"dockerfile",
 	"regex",
 	"nix",
+	"zig",
 }
 
 local ts = require("nvim-treesitter")
