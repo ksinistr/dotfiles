@@ -280,6 +280,7 @@ lib.mkMerge [
         ripgrep
         mods
         tree-sitter # tree-sitter-cli for nvim-treesitter
+        ghostty
       ]
       # ++ [ unstablePkgs.vectorcode ]
       ++ lib.optionals pkgs.stdenv.isLinux [
@@ -329,6 +330,8 @@ lib.mkMerge [
         map super+v paste_from_clipboard
         include current-theme.conf
       '' + lib.optionalString pkgs.stdenv.isLinux ''
+        allow_remote_control socket-only
+        listen_on unix:/tmp/kitty
         map ctrl+insert copy_to_clipboard
         map shift+insert paste_from_clipboard
       '';

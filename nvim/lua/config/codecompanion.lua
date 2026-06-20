@@ -118,14 +118,13 @@ require("codecompanion").setup({
 					},
 					schema = {
 						model = {
-							default = "anthropic/claude-opus-4.6",
+							default = "xiaomi/mimo-v2.5",
 							choices = {
-								"z-ai/glm-5",
-								"google/gemini-2.5-pro",
-								"moonshotai/kimi-k2.5",
-								"deepseek/deepseek-r1-0528",
-								"anthropic/claude-opus-4.6",
-								"google/gemini-3-pro-preview",
+								"minimax/minimax-m3",
+								"xiaomi/mimo-v2.5",
+								"z-ai/glm-5.2",
+								"deepseek/deepseek-v4-flash",
+								"anthropic/claude-opus-4.7",
 							},
 						},
 					},
