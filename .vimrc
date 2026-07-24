@@ -80,6 +80,10 @@ if 1
   colorscheme habamax
   syntax on
 
+  " Light, subtle line numbers (dim gray reads as thin in the terminal)
+  hi LineNr guifg=#332f2b ctermfg=237
+  hi CursorLineNr guifg=#5a5048 ctermfg=240 cterm=NONE gui=NONE
+
   " Auto-install plugins via Vim's native package system on first launch
   let s:plugins = [
     \ 'preservim/nerdtree',
@@ -88,6 +92,7 @@ if 1
     \ 'prabirshrestha/asyncomplete.vim',
     \ 'prabirshrestha/asyncomplete-lsp.vim',
     \ 'sheerun/vim-polyglot',
+    \ 'tpope/vim-commentary',
     \ ]
   let s:pack_dir = expand('~/.vim/pack/plugins/start/')
   let s:installed = 0
