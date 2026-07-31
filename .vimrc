@@ -93,6 +93,7 @@ if 1
     \ 'prabirshrestha/asyncomplete-lsp.vim',
     \ 'sheerun/vim-polyglot',
     \ 'tpope/vim-commentary',
+    \ 'easymotion/vim-easymotion',
     \ ]
   let s:pack_dir = expand('~/.vim/pack/plugins/start/')
   let s:installed = 0
@@ -115,6 +116,18 @@ if 1
   " NERDTree keybindings (matching nvim: <C-n> toggle, <leader>n find file)
   nnoremap <C-n> :NERDTreeToggle<CR>
   nnoremap <leader>n :NERDTreeFind<CR>
+
+  " EasyMotion: label every target on screen and jump to it (mirrors hop.nvim)
+  let g:EasyMotion_do_mapping = 0       " Only use the explicit maps below
+  let g:EasyMotion_smartcase = 1
+  let g:EasyMotion_keys = 'etovxqpdygfblzhckisuran'
+  nmap f <Plug>(easymotion-bd-w)
+  xmap f <Plug>(easymotion-bd-w)
+  omap f <Plug>(easymotion-bd-w)
+  nmap F <Plug>(easymotion-bd-jk)
+  xmap F <Plug>(easymotion-bd-jk)
+  nmap <leader>, <Plug>(easymotion-bd-f)
+  xmap <leader>, <Plug>(easymotion-bd-f)
 
   " Show diagnostics in the cmdline at cursor instead of an ugly floating window
   let g:lsp_diagnostics_echo_cursor = 1
