@@ -64,7 +64,8 @@ nnoremap <leader>y "+y
 nnoremap <leader>Y gg"+yG
 vnoremap <leader>y "+y
 
-" Search the word under the cursor across the project with Vim's built-in grep
+" Search the word under the cursor across the project with Vim's built-in grep.
+" Overridden below by the :Search prompt; this is the vim-tiny fallback.
 nnoremap <leader>s :vimgrep /\<<C-r><C-w>\>/ **/*<CR>:copen<CR>
 
 " Ultra-minimal grayscale color scheme for vim-tiny,
@@ -117,6 +118,17 @@ if 1
   nnoremap <C-n> :NERDTreeToggle<CR>
   nnoremap <leader>n :NERDTreeFind<CR>
 
+  " Project-wide search (mirrors nvim's :Rg prompt): <leader>s opens the cmdline,
+  " type a pattern, press Enter, and matches land in the quickfix list
+  if executable('rg')
+    set grepprg=rg\ --vimgrep\ --smart-case
+    set grepformat=%f:%l:%c:%m
+  else
+    set grepprg=grep\ -rnI\ $*\ .
+  endif
+  command! -nargs=+ Search silent! grep! <args> | copen | redraw!
+  nnoremap <leader>s :Search<space>
+
   " EasyMotion: label every target on screen and jump to it (mirrors hop.nvim)
   let g:EasyMotion_do_mapping = 0       " Only use the explicit maps below
   let g:EasyMotion_smartcase = 1
@@ -132,6 +144,27 @@ if 1
   " Show diagnostics in the cmdline at cursor instead of an ugly floating window
   let g:lsp_diagnostics_echo_cursor = 1
   let g:lsp_diagnostics_float_cursor = 0
+
+  " Only surface real errors; hide style/lint warnings (E501 line too long, etc.)
+  " Set g:lsp_diagnostics_enabled = 0 to turn diagnostics off entirely.
+  let g:lsp_diagnostics_signs_severity = 'error'
+  let g:lsp_diagnostics_highlights_severity = 'error'
+  let g:lsp_diagnostics_virtual_text_enabled = 0
+
+  " Turn off pycodestyle/pyflakes style checks in pylsp, keep hover and goto
+  let g:lsp_settings = {
+    \ 'pylsp-all': {
+    \   'workspace_config': {
+    \     'pylsp': {
+    \       'plugins': {
+    \         'pycodestyle': {'enabled': v:false},
+    \         'pyflakes': {'enabled': v:false},
+    \         'mccabe': {'enabled': v:false},
+    \       },
+    \     },
+    \   },
+    \ },
+    \ }
 
   " LSP keybindings, active only in buffers with a language server attached
   function! s:on_lsp_buffer_enabled() abort
