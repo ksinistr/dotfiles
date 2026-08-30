@@ -2,6 +2,11 @@
 vim:
 	ln -sf $(PWD)/.vimrc ~/.vimrc
 
+.PHONY: ghostty
+ghostty:
+	mkdir -p ~/.config/ghostty
+	ln -sf $(PWD)/ghostty/config ~/.config/ghostty/config
+
 .PHONY: debian-sudo
 debian-sudo:
 	echo "su -"
