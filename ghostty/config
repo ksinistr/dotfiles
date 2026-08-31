@@ -1,2 +1,4 @@
-font-family = IosevkaTerm Nerd Font Mono
-font-size = 15
+font-family = JetBrains Mono
+font-size = 14
+window-save-state = always
+quit-after-last-window-closed = true
