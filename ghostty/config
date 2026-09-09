@@ -1,4 +1,5 @@
 font-family = JetBrains Mono
-font-size = 14
+font-size = 11
 window-save-state = always
 quit-after-last-window-closed = true
+command = /home/anasyrov/.nix-profile/bin/zsh --login

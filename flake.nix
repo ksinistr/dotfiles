@@ -91,7 +91,7 @@
               {
                 programs.neovim = {
                   enable = true;
-                  package = pkgs.neovim-unwrapped;
+                  package = unstablePkgs.neovim-unwrapped;
                   viAlias = true;
                   vimAlias = true;
                   withNodeJs = true;

@@ -72,7 +72,6 @@ local mappings = {
 		-- lsp
 		{ "<leader>rn", "<cmd>lua vim.lsp.buf.rename()<CR>" },
 		{ "<leader>gd", "<cmd>lua vim.lsp.buf.definition()<CR>" },
-		{ "<leader>gd", "<cmd>lua vim.lsp.buf.decoration()<CR>" },
 		{ "<leader>gr", "<cmd>lua vim.lsp.buf.references()<CR>" },
 		{ "<leader>gi", "<cmd>lua vim.lsp.buf.implementation()<CR>" },
 		{ "<leader>D", "<cmd>lua vim.lsp.buf.type_definition()<CR>" },

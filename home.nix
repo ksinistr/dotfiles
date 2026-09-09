@@ -221,6 +221,16 @@ lib.mkMerge [
         gnumake
         ninja
         pkg-config
+        gmp
+        openssl
+        crystal_1_14
+        (crystalline.override { crystal = crystal_1_14; })
+        shards
+        pcre2
+        libyaml
+        nim
+        nimble
+        nimlangserver
 
         # Python (24.05: python311Packages available)
         uv
@@ -281,6 +291,7 @@ lib.mkMerge [
         mods
         tree-sitter # tree-sitter-cli for nvim-treesitter
         ghostty
+        remind
       ]
       # ++ [ unstablePkgs.vectorcode ]
       ++ lib.optionals pkgs.stdenv.isLinux [

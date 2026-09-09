@@ -118,13 +118,14 @@ require("codecompanion").setup({
 					},
 					schema = {
 						model = {
-							default = "xiaomi/mimo-v2.5",
+							default = "~deepseek/deepseek-v4-flash-latest",
 							choices = {
 								"minimax/minimax-m3",
 								"xiaomi/mimo-v2.5",
-								"z-ai/glm-5.2",
-								"deepseek/deepseek-v4-flash",
-								"anthropic/claude-opus-4.7",
+								"~z-ai/glm-latest",
+								"~z-ai/glm-flash-latest",
+								"~deepseek/deepseek-v4-flash-latest",
+								"tencent/hy4-preview",
 							},
 						},
 					},
