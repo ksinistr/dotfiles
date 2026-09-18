@@ -22,15 +22,19 @@ let
       let
         version = "2.5.0";
         platform =
-          if super.stdenv.hostPlatform.system == "aarch64-darwin" then "darwin-arm64"
-          else if super.stdenv.hostPlatform.system == "x86_64-darwin" then "darwin-amd64"
-          else if super.stdenv.hostPlatform.system == "aarch64-linux" then "linux-arm64"
-          else "linux-amd64";
+          if super.stdenv.hostPlatform.system == "aarch64-darwin" then
+            "darwin-arm64"
+          else if super.stdenv.hostPlatform.system == "x86_64-darwin" then
+            "darwin-amd64"
+          else if super.stdenv.hostPlatform.system == "aarch64-linux" then
+            "linux-arm64"
+          else
+            "linux-amd64";
         hashes = {
           "darwin-arm64" = "sha256-Czy9wqJHL2C1OOvMsbLhrl2TigUcAQWRqmjG79NwZnI=";
           "darwin-amd64" = "sha256-p+aEhysAY31kLQiN3ng8G4cRYakmePzxPQer5rXDLjY=";
-          "linux-arm64"  = "sha256-SGk6mKf0VW0RFzAKriQND+SD341vNt+rpWUEYmEBpm4=";
-          "linux-amd64"  = "sha256-x3MTp34ZsGEjlixBHZlDzA0JK77Ha5VhBNGJZOJ0kC4=";
+          "linux-arm64" = "sha256-SGk6mKf0VW0RFzAKriQND+SD341vNt+rpWUEYmEBpm4=";
+          "linux-amd64" = "sha256-x3MTp34ZsGEjlixBHZlDzA0JK77Ha5VhBNGJZOJ0kC4=";
         };
       in
       super.stdenv.mkDerivation {
@@ -55,7 +59,9 @@ let
 
   # Apply the overlay
   customPkgs = pkgs.extend go-overlay;
-  rustToolchain = pkgs.rust-bin.stable.latest.default;
+  rustToolchain = pkgs.rust-bin.stable.latest.default.override {
+    targets = [ "thumbv6m-none-eabi" ];
+  };
 
   gwt = pkgs.runCommand "gwt" {
     src = pkgs.fetchFromGitHub {
@@ -379,7 +385,8 @@ lib.mkMerge [
         map super+c copy_to_clipboard
         map super+v paste_from_clipboard
         include current-theme.conf
-      '' + lib.optionalString pkgs.stdenv.isLinux ''
+      ''
+      + lib.optionalString pkgs.stdenv.isLinux ''
         allow_remote_control socket-only
         listen_on unix:/tmp/kitty
         map ctrl+insert copy_to_clipboard
@@ -393,17 +400,45 @@ lib.mkMerge [
         };
         keyboard = {
           bindings = [
-              # macOS-like (Super mapped by keyd to send Insert variants)
-              { key = "Insert"; mods = "Control"; action = "Copy"; }   # Super+C (keyd -> Ctrl+Insert)
-              { key = "Insert"; mods = "Shift";   action = "Paste"; }  # Super+V (keyd -> Shift+Insert) use CLIPBOARD now
-              # Optional: keep legacy PRIMARY access
-              { key = "Y";      mods = "Control|Shift"; action = "PasteSelection"; } # Explicit primary if needed
-              # Standard terminal shortcuts (still available)
-              { key = "C"; mods = "Control|Shift"; action = "Copy"; }
-              { key = "V"; mods = "Control|Shift"; action = "Paste"; }
-              # (Super variants directly, if you also press them without keyd translation)
-              { key = "C"; mods = "Super"; action = "Copy"; }
-              { key = "V"; mods = "Super"; action = "Paste"; }
+            # macOS-like (Super mapped by keyd to send Insert variants)
+            {
+              key = "Insert";
+              mods = "Control";
+              action = "Copy";
+            } # Super+C (keyd -> Ctrl+Insert)
+            {
+              key = "Insert";
+              mods = "Shift";
+              action = "Paste";
+            } # Super+V (keyd -> Shift+Insert) use CLIPBOARD now
+            # Optional: keep legacy PRIMARY access
+            {
+              key = "Y";
+              mods = "Control|Shift";
+              action = "PasteSelection";
+            } # Explicit primary if needed
+            # Standard terminal shortcuts (still available)
+            {
+              key = "C";
+              mods = "Control|Shift";
+              action = "Copy";
+            }
+            {
+              key = "V";
+              mods = "Control|Shift";
+              action = "Paste";
+            }
+            # (Super variants directly, if you also press them without keyd translation)
+            {
+              key = "C";
+              mods = "Super";
+              action = "Copy";
+            }
+            {
+              key = "V";
+              mods = "Super";
+              action = "Paste";
+            }
           ];
         };
         terminal = {

@@ -118,8 +118,9 @@ require("codecompanion").setup({
 					},
 					schema = {
 						model = {
-							default = "~deepseek/deepseek-v4-flash-latest",
+							default = "openai/gpt-5.6-luna-pro:nitro",
 							choices = {
+								"google/gemini-3.8-flash",
 								"minimax/minimax-m3",
 								"xiaomi/mimo-v2.5",
 								"~z-ai/glm-latest",

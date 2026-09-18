@@ -47,6 +47,9 @@ vim.opt.termguicolors = true
 vim.opt.spelllang = "en_gb"
 vim.opt.mousemodel = "popup"
 
+-- the bundled ocaml ftplugin steals <LocalLeader>c, <LocalLeader>t, <LocalLeader>s
+vim.g.no_ocaml_maps = 1
+
 vim.g.netrw_banner = 0
 vim.g.netrw_liststyle = 3
 
