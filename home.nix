@@ -290,6 +290,7 @@ lib.mkMerge [
         python311Packages.pylint
         python311Packages.llm
         python311Packages.llm-anthropic
+        python311Packages.matplotlib
 
         # Node
         nodejs_24
@@ -344,6 +345,7 @@ lib.mkMerge [
         # flatpak/gnome-software-plugin-flatpak — better at system level
         ghostty
         gcc
+        systemd.dev
         wl-clipboard # Linux+Wayland
         xclip
       ];
@@ -512,6 +514,7 @@ lib.mkMerge [
       UV_PYTHON = "/usr/bin/python3.13";
       # Optional safety: don't allow pip outside a venv
       PIP_REQUIRE_VIRTUALENV = "1";
+      PKG_CONFIG_PATH = "${pkgs.systemd.dev}/lib/pkgconfig";
       TERMINAL = "kitty";
     };
   })
