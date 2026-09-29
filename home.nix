@@ -56,6 +56,21 @@ let
   # Apply the overlay
   customPkgs = pkgs.extend go-overlay;
   rustToolchain = pkgs.rust-bin.stable.latest.default;
+
+  gwt = pkgs.runCommand "gwt" {
+    src = pkgs.fetchFromGitHub {
+      owner = "gko";
+      repo = "gwt";
+      rev = "4d8c89c6e960357b7b50a31d909d96c6af272ca6";
+      hash = "sha256-UnAuXM8EoW9qQccA37USqCpWrq03NcByW4hO/MJ1DxI=";
+    };
+  } ''
+    mkdir -p $out
+    cp $src/gwt.sh $out/gwt.plugin.zsh
+    substituteInPlace $out/gwt.plugin.zsh \
+      --replace-fail '../''${current_folder_name}_''${sanitized_branch_name}' '../''${current_folder_name}.''${sanitized_branch_name}'
+    cp $src/_gwt.zsh_completion $out/_gwt
+  '';
 in
 lib.mkMerge [
   {
@@ -78,6 +93,14 @@ lib.mkMerge [
       enableCompletion = true;
       autosuggestion.enable = true;
       syntaxHighlighting.enable = true;
+
+      plugins = [
+        {
+          name = "gwt";
+          src = gwt;
+          file = "gwt.plugin.zsh";
+        }
+      ];
 
       shellAliases = {
         vi = "nvim";
@@ -140,6 +163,14 @@ lib.mkMerge [
         bindkey "^A" vi-beginning-of-line
         bindkey "^E" vi-end-of-line
 
+        gwt-widget() {
+          zle push-line
+          BUFFER="gwt"
+          zle accept-line
+        }
+        zle -N gwt-widget
+        bindkey '^W' gwt-widget
+
         # llm -s "respond with 3 choices that can be ran directly on command line, no formatting" --save cli
         # llm_cli(){
         #     emulate -L zsh
@@ -200,6 +231,14 @@ lib.mkMerge [
 
     programs.bat.enable = true;
     programs.eza.enable = true;
+
+    programs.zellij = {
+      enable = true;
+      settings = {
+        default_mode = "locked";
+        default_shell = zshShell;
+      };
+    };
 
     # direnv (if you use it)
     programs.direnv = {
@@ -290,7 +329,6 @@ lib.mkMerge [
         ripgrep
         mods
         tree-sitter # tree-sitter-cli for nvim-treesitter
-        ghostty
         remind
       ]
       # ++ [ unstablePkgs.vectorcode ]
@@ -298,6 +336,7 @@ lib.mkMerge [
         # Only Linux specific (if you want to separate)
         # pipewire — system service, NOT installed in user profile
         # flatpak/gnome-software-plugin-flatpak — better at system level
+        ghostty
         gcc
         wl-clipboard # Linux+Wayland
         xclip
