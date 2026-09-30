@@ -60,3 +60,13 @@ nix-linux: nix
 .PHONY: nix-macos
 nix-macos: nix
 	nix run github:nix-community/home-manager/release-25.05 -- switch --flake .#artur-macos
+
+.PHONY: claude
+claude:
+	command -v jq >/dev/null || { echo "jq is required"; exit 1; }
+	mkdir -p ~/.claude/hooks
+	for f in $(PWD)/claude/hooks/*; do ln -sf "$$f" ~/.claude/hooks/; done
+	[ -f ~/.claude/settings.json ] || echo '{}' > ~/.claude/settings.json
+	cp ~/.claude/settings.json ~/.claude/settings.json.bak
+	ln -sf $(PWD)/claude/statusline-command.sh ~/.claude/statusline-command.sh
+	jq -s '.[0] + .[1]' ~/.claude/settings.json.bak $(PWD)/claude/settings.json > ~/.claude/settings.json
