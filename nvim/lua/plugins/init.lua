@@ -1,6 +1,5 @@
 return {
 	-- { "echasnovski/mini.nvim", version = false },
-	{ "github/copilot.vim", lazy = false, enabled = vim.env.AI_COMPLETION_PROVIDER ~= "minuet" },
 
 	{ "christianchiarulli/nvcode-color-schemes.vim", lazy = true },
 
