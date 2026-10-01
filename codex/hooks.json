@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CODEX_HOME:-$HOME/.codex}/hooks/english-check.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

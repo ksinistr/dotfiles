@@ -70,3 +70,16 @@ claude:
 	cp ~/.claude/settings.json ~/.claude/settings.json.bak
 	ln -sf $(PWD)/claude/statusline-command.sh ~/.claude/statusline-command.sh
 	jq -s '.[0] + .[1]' ~/.claude/settings.json.bak $(PWD)/claude/settings.json > ~/.claude/settings.json
+
+CODEX_DIR ?= $(if $(CODEX_HOME),$(CODEX_HOME),$(HOME)/.codex)
+
+.PHONY: codex
+codex:
+	command -v jq >/dev/null || { echo "jq is required"; exit 1; }
+	command -v codex >/dev/null || { echo "codex is required"; exit 1; }
+	command -v perl >/dev/null || { echo "perl is required"; exit 1; }
+	mkdir -p "$(CODEX_DIR)/hooks"
+	for f in "$(PWD)"/codex/hooks/*.sh; do ln -sf "$$f" "$(CODEX_DIR)/hooks/"; done
+	[ -f "$(CODEX_DIR)/hooks.json" ] || echo '{}' > "$(CODEX_DIR)/hooks.json"
+	cp "$(CODEX_DIR)/hooks.json" "$(CODEX_DIR)/hooks.json.bak"
+	jq -s '.[0] * .[1]' "$(CODEX_DIR)/hooks.json.bak" "$(PWD)/codex/hooks.json" > "$(CODEX_DIR)/hooks.json"
