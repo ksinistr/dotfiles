@@ -342,6 +342,19 @@ lib.mkMerge [
         ghostty
         gcc
         systemd.dev
+        glib.dev
+        gtk3.dev
+        libsoup_3.dev
+        webkitgtk_4_1.dev
+        pcre2.dev
+        libffi.dev
+        fontconfig.dev
+        xorg.libxcb.dev
+        xorg.libXau.dev
+        xorg.libXdmcp.dev
+        libxkbcommon.dev
+        wayland.dev
+        zlib.dev
         wl-clipboard # Linux+Wayland
         xclip
       ];
@@ -510,7 +523,45 @@ lib.mkMerge [
       UV_PYTHON = "/usr/bin/python3.13";
       # Optional safety: don't allow pip outside a venv
       PIP_REQUIRE_VIRTUALENV = "1";
-      PKG_CONFIG_PATH = "${pkgs.systemd.dev}/lib/pkgconfig";
+      PKG_CONFIG_PATH = lib.makeSearchPath "lib/pkgconfig" (
+        map lib.getDev (
+          lib.closePropagation [
+            pkgs.systemd
+            pkgs.glib
+            pkgs.gtk3
+            pkgs.libsoup_3
+            pkgs.webkitgtk_4_1
+            pkgs.pcre2
+            pkgs.libffi
+            pkgs.fontconfig
+            pkgs.xorg.libxcb
+            pkgs.xorg.libXau
+            pkgs.xorg.libXdmcp
+            pkgs.libxkbcommon
+            pkgs.wayland
+            pkgs.zlib
+          ]
+        )
+      );
+      LIBRARY_PATH = lib.makeLibraryPath [
+        pkgs.fontconfig
+        pkgs.xorg.libxcb
+        pkgs.xorg.libXau
+        pkgs.xorg.libXdmcp
+        pkgs.libxkbcommon
+        pkgs.wayland
+        pkgs.zlib
+      ];
+      LD_LIBRARY_PATH = lib.makeLibraryPath [
+        pkgs.fontconfig
+        pkgs.xorg.libxcb
+        pkgs.xorg.libXau
+        pkgs.xorg.libXdmcp
+        pkgs.libxkbcommon
+        pkgs.wayland
+        pkgs.vulkan-loader
+      ];
+      VK_DRIVER_FILES = "${pkgs.mesa}/share/vulkan/icd.d/intel_icd.x86_64.json";
       TERMINAL = "kitty";
     };
   })
