@@ -35,6 +35,24 @@ debian-apt:
 		firefox-esr \
 		chromium \
 		flatpak \
+		build-essential \
+		pkg-config \
+		libsystemd-dev \
+		libglib2.0-dev \
+		libgtk-3-dev \
+		libsoup-3.0-dev \
+		libwebkit2gtk-4.1-dev \
+		libpcre2-dev \
+		libffi-dev \
+		libfontconfig1-dev \
+		libxcb1-dev \
+		libxkbcommon-dev \
+		libxkbcommon-x11-dev \
+		libwayland-dev \
+		libx11-xcb-dev \
+		libxau-dev \
+		libxdmcp-dev \
+		zlib1g-dev \
 		plasma-discover-backend-flatpak 
 
 .PHONY: debian-flatpak
@@ -44,6 +62,14 @@ debian-flatpak:
 		org.telegram.desktop \
 		io.dbeaver.DBeaverCommunity \
 		com.getpostman.Postman
+
+RUST_TOOLCHAIN ?= 1.95.0
+
+.PHONY: rust-toolchain
+rust-toolchain:
+	rustup toolchain install $(RUST_TOOLCHAIN)
+	rustup default $(RUST_TOOLCHAIN)
+	rustup target add --toolchain $(RUST_TOOLCHAIN) thumbv6m-none-eabi
 
 .PHONY: debian
 debian: debian-sudo debian-apt debian-flatpak

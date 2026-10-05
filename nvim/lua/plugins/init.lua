@@ -23,6 +23,7 @@ return {
 	{ "tyru/open-browser.vim" },
 	{ "weirongxu/plantuml-previewer.vim" },
 	{ "rhysd/git-messenger.vim" },
+	{ "bullets-vim/bullets.vim" },
 
 	-- react native
 	-- use("dimaportenko/telescope-simulators.nvim")

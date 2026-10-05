@@ -111,6 +111,7 @@ if 1
     \ 'prabirshrestha/asyncomplete-lsp.vim',
     \ 'sheerun/vim-polyglot',
     \ 'tpope/vim-commentary',
+    \ 'bullets-vim/bullets.vim',
     \ 'easymotion/vim-easymotion',
     \ ]
   let s:pack_dir = expand('~/.vim/pack/plugins/start/')
