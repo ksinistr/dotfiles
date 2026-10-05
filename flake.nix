@@ -4,10 +4,6 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    rust-overlay = {
-      url = "github:oxalica/rust-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
 
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -20,7 +16,6 @@
       self,
       nixpkgs,
       unstable,
-      rust-overlay,
       home-manager,
       worktrunk,
       ...
@@ -72,7 +67,6 @@
             inherit system;
             overlays = [
               overlay-golangci-lint
-              rust-overlay.overlays.default
             ];
           };
           unstablePkgs = import unstable { inherit system; };

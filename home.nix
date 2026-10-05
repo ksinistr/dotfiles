@@ -59,9 +59,6 @@ let
 
   # Apply the overlay
   customPkgs = pkgs.extend go-overlay;
-  rustToolchain = pkgs.rust-bin.stable.latest.default.override {
-    targets = [ "thumbv6m-none-eabi" ];
-  };
 
   gwt = pkgs.runCommand "gwt" {
     src = pkgs.fetchFromGitHub {
@@ -186,6 +183,7 @@ lib.mkMerge [
         # bindkey '^[l' llm_cli   # ^[ is ESC, so Meta-l
         export PATH="$HOME/.local/bin:$PATH"
         export PATH="$HOME/.opencode/bin:$PATH"
+        export PATH="$(brew --prefix rustup)/bin:$PATH"
       '';
     };
 
@@ -312,8 +310,6 @@ lib.mkMerge [
         golines
         yamlfmt
 
-        # Rust
-        rustToolchain
         stylua
 
         # Dev tools
