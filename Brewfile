@@ -26,7 +26,6 @@ cask_args appdir: "/Applications", require_sha: true
 
 # Apps
 cask 'discord'
-cask 'docker-desktop'
 cask 'firefox'
 cask 'slack'
 cask 'dbeaver-community'
