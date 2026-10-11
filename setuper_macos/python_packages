@@ -1,9 +1,0 @@
-pytest
-pynvim
-python-language-server
-flake8
-black
-pycodestyle
-pyflakes
-pylint
-autopep8

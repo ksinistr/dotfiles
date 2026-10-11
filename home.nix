@@ -15,50 +15,6 @@ let
   zshShell = "${pkgs.zsh}/bin/zsh";
   zshLoginShell = "${zshShell} --login";
 
-  # Overlay for custom Go packages
-  go-overlay = self: super: {
-    go_1_25 = unstablePkgs.go_1_25;
-    golangci-lint =
-      let
-        version = "2.5.0";
-        platform =
-          if super.stdenv.hostPlatform.system == "aarch64-darwin" then
-            "darwin-arm64"
-          else if super.stdenv.hostPlatform.system == "x86_64-darwin" then
-            "darwin-amd64"
-          else if super.stdenv.hostPlatform.system == "aarch64-linux" then
-            "linux-arm64"
-          else
-            "linux-amd64";
-        hashes = {
-          "darwin-arm64" = "sha256-Czy9wqJHL2C1OOvMsbLhrl2TigUcAQWRqmjG79NwZnI=";
-          "darwin-amd64" = "sha256-p+aEhysAY31kLQiN3ng8G4cRYakmePzxPQer5rXDLjY=";
-          "linux-arm64" = "sha256-SGk6mKf0VW0RFzAKriQND+SD341vNt+rpWUEYmEBpm4=";
-          "linux-amd64" = "sha256-x3MTp34ZsGEjlixBHZlDzA0JK77Ha5VhBNGJZOJ0kC4=";
-        };
-      in
-      super.stdenv.mkDerivation {
-        pname = "golangci-lint";
-        inherit version;
-        src = super.fetchurl {
-          url = "https://github.com/golangci/golangci-lint/releases/download/v${version}/golangci-lint-${version}-${platform}.tar.gz";
-          hash = hashes.${platform};
-        };
-        sourceRoot = "golangci-lint-${version}-${platform}";
-        installPhase = ''
-          mkdir -p $out/bin
-          cp golangci-lint $out/bin/
-        '';
-        meta = with super.lib; {
-          description = "Fast linters runner for Go";
-          homepage = "https://golangci-lint.run/";
-          license = licenses.gpl3Only;
-        };
-      };
-  };
-
-  # Apply the overlay
-  customPkgs = pkgs.extend go-overlay;
   gwt = pkgs.runCommand "gwt" {
     src = pkgs.fetchFromGitHub {
       owner = "gko";
@@ -182,7 +138,12 @@ lib.mkMerge [
         # bindkey '^[l' llm_cli   # ^[ is ESC, so Meta-l
         export PATH="$HOME/.local/bin:$PATH"
         export PATH="$HOME/.opencode/bin:$PATH"
-        export PATH="$(brew --prefix rustup)/bin:$PATH"
+        eval "$(fnm env --use-on-cd --shell zsh)"
+        ${lib.optionalString pkgs.stdenv.isDarwin ''
+          if command -v brew >/dev/null 2>&1; then
+            export PATH="$(brew --prefix rustup)/bin:$PATH"
+          fi
+        ''}
       '';
     };
 
@@ -194,11 +155,11 @@ lib.mkMerge [
       PAGER = "less -FRX";
       LANG = "en_US.UTF-8";
 
-      PATH = "$PATH:$GOPATH/bin:$GOROOT/bin";
       FZF_DEFAULT_COMMAND = "rg --files --hidden --follow --glob '!.git'";
       KUBECONFIG = "$HOME/.kube/config";
       NPM_CONFIG_PREFIX = npmGlobal;
       NPM_CONFIG_CACHE = "${config.home.homeDirectory}/.npm-cache";
+      PIP_REQUIRE_VIRTUALENV = "1";
     };
 
     ############################################
@@ -257,60 +218,17 @@ lib.mkMerge [
       [
         # Build tools
         git
-        cmake
         unzip
         wget
-        gnumake
-        ninja
-        gmp
-        openssl
-        crystal_1_14
-        (crystalline.override { crystal = crystal_1_14; })
-        shards
-        pcre2
-        libyaml
-        nim
-        nimble
-        nimlangserver
 
-        # Python (24.05: python311Packages available)
+        # Toolchain managers
         uv
-        python3
-        python311Packages.pip
-        python311Packages.virtualenv
-        python311Packages.pytest
-        python311Packages.pynvim
-        python311Packages.python-lsp-server
-        python311Packages.black
-        python311Packages.flake8
-        python311Packages.pylint
-        python311Packages.llm
-        python311Packages.llm-anthropic
-        python311Packages.matplotlib
-
-        # Node
-        nodejs_24
-        nodePackages.typescript
-        nodePackages.typescript-language-server
-        nodePackages.vscode-langservers-extracted
-        nodePackages.dockerfile-language-server-nodejs
-        nodePackages.yaml-language-server
-        nodePackages.yarn
-        nodePackages.prettier
-
-        # Go and tools (some tools may be missing in 24.05)
-        (customPkgs.go_1_25)
-        customPkgs.golangci-lint
-        (pkgs.golangci-lint-langserver.overrideAttrs { doCheck = false; })
-        gopls
-        gofumpt
-        gci
-        golines
-        yamlfmt
+        fnm
 
         stylua
 
         # Dev tools
+        gleam
         protobuf
         kubectl
         kubernetes-helm
@@ -337,12 +255,15 @@ lib.mkMerge [
         # Only Linux specific (if you want to separate)
         # pipewire — system service, NOT installed in user profile
         # flatpak/gnome-software-plugin-flatpak — better at system level
-        ghostty
         wl-clipboard # Linux+Wayland
         xclip
       ];
 
-    home.sessionPath = [ "${npmGlobal}/bin" ];
+    home.sessionPath = [
+      "${npmGlobal}/bin"
+      "${config.home.homeDirectory}/go/bin"
+      "${config.home.homeDirectory}/.cargo/bin"
+    ];
 
     # do the install with an explicit prefix so it never touches /nix/store
     # home.activation.installClaudeCode = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
@@ -387,6 +308,12 @@ lib.mkMerge [
         map shift+insert paste_from_clipboard
       '';
       "kitty/current-theme.conf".source = ./kitty/current-theme.conf;
+      "uv/uv.toml".text = ''
+        python-preference = "system"
+      '';
+      "uv/.python-version".text = ''
+        3.13
+      '';
       "alacritty/alacritty.toml".source = (pkgs.formats.toml { }).generate "alacritty.toml" {
         env = {
           TERM = "xterm-256color";
@@ -474,6 +401,8 @@ lib.mkMerge [
   (lib.mkIf pkgs.stdenv.isLinux {
     fonts.fontconfig.enable = true;
 
+    home.sessionPath = [ "/usr/local/go/bin" ];
+
     # example:
     # home.packages = [ pkgs.wl-clipboard ];
     xdg.configFile = {
@@ -499,13 +428,9 @@ lib.mkMerge [
     home.sessionVariables = {
       GOPATH = "${config.home.homeDirectory}/go";
       GOMODCACHE = "${config.home.homeDirectory}/go/pkg/mod";
-      GOROOT = "${customPkgs.go_1_25}/share/go";
       GOBIN = "${config.home.homeDirectory}/go/bin";
       GOCACHE = "${config.home.homeDirectory}/.cache/go-build";
 
-      UV_PYTHON = "/usr/bin/python3.13";
-      # Optional safety: don't allow pip outside a venv
-      PIP_REQUIRE_VIRTUALENV = "1";
       TERMINAL = "kitty";
     };
   })
@@ -517,7 +442,6 @@ lib.mkMerge [
     home.sessionVariables = {
       GOPATH = "$HOME/go";
       GOMODCACHE = "$HOME/Library/Caches/go/mod";
-      GOROOT = "${customPkgs.go_1_25}/share/go";
       GOBIN = "$HOME/go/bin";
       GOCACHE = "$HOME/Library/Caches/go-build";
       LD = "/usr/bin/ld";

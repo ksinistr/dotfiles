@@ -28,7 +28,6 @@ local ensure_installed = {
 	"zig",
 	"crystal",
 	"ocaml",
-  "nim",
 }
 
 local ts = require("nvim-treesitter")

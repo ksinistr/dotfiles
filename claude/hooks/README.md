@@ -6,10 +6,11 @@ Personal hooks wired in `~/.claude/settings.json`. Install them with `make claud
 
 ### guard-env.sh
 
-- Event: `PreToolUse`, matcher `Read|Edit|Write`
+- Event: `PreToolUse`, matcher `Read|Edit|Write|Bash`
 - Denies reading or editing real credential files: `.env`, `.env.local`, `.env.development`, `.env.staging`, `.env.production`, `.zshrc`, `.zprofile`.
+- For Bash, denies any command that names one of these files as a path component (`cat ~/.zprofile`, `grep x .env`). It catches accidental reads; a glob or a variable gets past it.
 - Templates such as `.env.example` and `.env.sample` stay allowed.
-- To protect another file, add its basename to the `case` list.
+- To protect another file, add its basename to `PROTECTED_FILES`.
 
 ### mcp-write-ask.sh
 

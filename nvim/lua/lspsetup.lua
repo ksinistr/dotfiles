@@ -39,7 +39,6 @@ require("mason-lspconfig").setup({
 
 -- custom LSP configurations
 vim.lsp.config("golangci_lint_ls", require("config.lsp.golangci"))
-vim.lsp.config("nim_langserver", require("config.lsp.nim"))
 vim.lsp.config("pylsp", require("config.lsp.python"))
 vim.lsp.config("rust_analyzer", require("config.lsp.rust"))
 vim.lsp.config("ts_ls", require("config.lsp.typescript"))
@@ -52,4 +51,4 @@ vim.lsp.enable("nil_ls")
 vim.lsp.enable("zls")
 vim.lsp.enable("crystalline")
 vim.lsp.enable('ocamllsp')
-vim.lsp.enable('nim_langserver')
+vim.lsp.enable('gleam')
