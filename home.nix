@@ -149,6 +149,14 @@ lib.mkMerge [
           done
           unset name value
         ''}
+        ${lib.optionalString pkgs.stdenv.isLinux ''
+          if command -v secret-tool >/dev/null 2>&1; then
+            for name in $(secret-tool search --all service env 2>&1 >/dev/null | sed -n 's/^attribute\.name = \([A-Za-z_][A-Za-z0-9_]*\)$/\1/p'); do
+              value=$(secret-tool lookup service env name "$name" 2>/dev/null) && export "$name=$value"
+            done
+            unset name value
+          fi
+        ''}
       '';
     };
 
@@ -231,6 +239,7 @@ lib.mkMerge [
         kubernetes-helm
         nixfmt-rfc-style
         nil
+        shellcheck
         openjdk
         plantuml
         graphviz
@@ -420,6 +429,11 @@ lib.mkMerge [
     fonts.fontconfig.enable = true;
 
     home.sessionPath = [ "/usr/local/go/bin" ];
+
+    home.file.".local/bin/keyring-env" = {
+      source = ./keyring-env.sh;
+      executable = true;
+    };
 
     # example:
     # home.packages = [ pkgs.wl-clipboard ];

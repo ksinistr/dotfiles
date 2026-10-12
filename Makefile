@@ -78,6 +78,7 @@ debian-apt:
 		transmission \
 		vlc \
 		keepassxc \
+		libsecret-tools \
 		calibre \
 		firefox-esr \
 		chromium \
