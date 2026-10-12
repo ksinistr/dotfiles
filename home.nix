@@ -240,6 +240,8 @@ lib.mkMerge [
 
         # Fonts (nerdfonts option)
         nerd-fonts.iosevka-term
+        nerd-fonts.fira-mono
+        nerd-fonts.jetbrains-mono
 
         # Zsh git prompt
         zsh-git-prompt
