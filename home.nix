@@ -143,6 +143,11 @@ lib.mkMerge [
           if command -v brew >/dev/null 2>&1; then
             export PATH="$(brew --prefix rustup)/bin:$PATH"
           fi
+
+          for name in $(security dump-keychain 2>/dev/null | sed -n 's/^ *"svce"<blob>="env\/\([A-Za-z_][A-Za-z0-9_]*\)"$/\1/p'); do
+            value=$(security find-generic-password -s "env/$name" -w 2>/dev/null) && export "$name=$value"
+          done
+          unset name value
         ''}
       '';
     };
@@ -452,6 +457,11 @@ lib.mkMerge [
   (lib.mkIf pkgs.stdenv.isDarwin {
     # example:
     # home.sessionVariables.PATH = "$PATH:/opt/homebrew/bin";
+    home.file.".local/bin/keychain-env" = {
+      source = ./keychain-env.sh;
+      executable = true;
+    };
+
     home.sessionVariables = {
       GOPATH = "$HOME/go";
       GOMODCACHE = "$HOME/Library/Caches/go/mod";
