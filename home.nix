@@ -196,14 +196,6 @@ lib.mkMerge [
     programs.bat.enable = true;
     programs.eza.enable = true;
 
-    programs.zellij = {
-      enable = true;
-      settings = {
-        default_mode = "locked";
-        default_shell = zshShell;
-      };
-    };
-
     # direnv (if you use it)
     programs.direnv = {
       enable = true;
@@ -251,8 +243,27 @@ lib.mkMerge [
         mods
         tree-sitter # tree-sitter-cli for nvim-treesitter
         remind
+        fd
+        jq
+        yq-go
+        htop
+        gh
+        git-lfs
+        grpcurl
+        httpie
+        miller
+        mpremote
+        nmap
+        exiftool
+        apktool
+        buf
+        natscli
       ]
       # ++ [ unstablePkgs.vectorcode ]
+      ++ lib.optionals pkgs.stdenv.isDarwin [
+        bashInteractive
+        watch
+      ]
       ++ lib.optionals pkgs.stdenv.isLinux [
         # Only Linux specific (if you want to separate)
         # pipewire — system service, NOT installed in user profile

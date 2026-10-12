@@ -10,7 +10,7 @@ Everything installs bottom-up; each layer needs the one below it. Which package 
 |---|---|---|
 | 1. OS | compilers, runtimes, native libraries, apps | `make debian` / `make macos-brew` |
 | 2. Home Manager | configs, CLI tools, `uv`, `fnm`, PATH | `make nix-linux` / `make nix-macos` |
-| 3. Toolchains | Rust, Node, Python/Go tools | `make rust-toolchain toolchains` |
+| 3. Toolchains | Rust, Node, Python/Go tools | `make toolchains` |
 
 Layer 3 needs a new zsh session after layer 2: Home Manager sets PATH and environment only when a shell starts. On Debian the login shell is bash, so open kitty (it starts zsh) or run `zsh -l`.
 
@@ -25,7 +25,7 @@ Layer 3 needs a new zsh session after layer 2: Home Manager sets PATH and enviro
 5. Install Nix: `sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon`, then open a new terminal.
 6. `make nix-linux`
 7. Log out and back in, open kitty.
-8. `make rust-toolchain toolchains`
+8. `make toolchains`
 9. Open `nvim` and let Mason install the language servers.
 10. Optionally `make claude codex ghostty vim`.
 
@@ -34,12 +34,12 @@ Layer 3 needs a new zsh session after layer 2: Home Manager sets PATH and enviro
 1. `xcode-select --install`
 2. Install Homebrew (https://brew.sh) and add `eval "$(/opt/homebrew/bin/brew shellenv)"` to `~/.zprofile`.
 3. `git clone https://github.com/ksinistr/dotfiles.git ~/dotfiles && cd ~/dotfiles`
-4. `make macos-brew`. The `Brewfile` also lists apps (`mactex-no-gui` alone is several GB); delete the lines you don't want first.
+4. `make macos-brew`
 5. Install kitty following the official guide: https://sw.kovidgoyal.net/kitty/binary/
 6. Install Nix: `sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install)`, then open a new terminal.
 7. `make nix-macos`
 8. Open a new terminal window.
-9. `make rust-toolchain toolchains`
+9. `make toolchains`
 10. Open `nvim` and let Mason install the language servers.
 11. Optionally `make claude codex ghostty vim`.
 
@@ -57,10 +57,10 @@ One-off; delete this section, and its block in `make help`, once both machines a
 
 ### macOS
 
-1. `make macos-brew-diff` compares the `Brewfile` with what is installed (`macos-brew-missing` and `macos-brew-extra` run each half). Delete the lines you don't want, add what you keep.
+1. `make macos-brew-diff` compares the `Brewfile` with what is installed (`macos-brew-missing` and `macos-brew-extra` run each half). It only lists; `brew bundle cleanup --force --file=Brewfile` removes the extras. Delete the lines you don't want, add what you keep.
 2. `make macos-brew`
 3. `make nix-macos`
-4. Open a new terminal window. `which go python3.13` must point into `/opt/homebrew/bin`.
+4. Close every terminal window and IDE: they keep `GOROOT` from the Nix Go and break the Homebrew one. Open a new terminal window. `echo $GOROOT` must print nothing and `which go python3.13` must point into `/opt/homebrew/bin`.
 5. `make toolchains`
 6. Open `nvim` and let Mason install pylsp.
 

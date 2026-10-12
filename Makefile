@@ -11,17 +11,17 @@ Fresh Debian
   4. Nix:   sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon
   5. make nix-linux                     Home Manager
   6. re-login, open kitty               zsh picks up the new PATH
-  7. make rust-toolchain toolchains     Rust, Node, Python/Go tools
+  7. make toolchains                    Rust, Node, Python/Go tools
   8. nvim                               Mason installs language servers
 
 Fresh macOS
   1. xcode-select --install; Homebrew: https://brew.sh
-  2. make macos-brew                    Brewfile (edit out unwanted apps first)
+  2. make macos-brew                    Brewfile
   3. kitty: https://sw.kovidgoyal.net/kitty/binary/
   4. Nix:   sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install)
   5. make nix-macos                     Home Manager
   6. new terminal window
-  7. make rust-toolchain toolchains
+  7. make toolchains
   8. nvim
 
 Migrating a machine that had toolchains in Nix (one-off)
@@ -161,7 +161,6 @@ python-tools:
 	command -v uv >/dev/null || { echo "uv is required"; exit 1; }
 	uv tool install --upgrade ruff
 	uv tool install --upgrade llm --with llm-anthropic
-	uv tool install --upgrade ocrmypdf
 
 .PHONY: go-tools
 go-tools:
@@ -175,7 +174,7 @@ go-tools:
 	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 
 .PHONY: toolchains
-toolchains: node python-tools go-tools
+toolchains: rust-toolchain node python-tools go-tools
 
 .PHONY: debian
 debian: debian-sudo debian-apt debian-flatpak debian-crystal debian-go
@@ -192,7 +191,7 @@ macos-brew-missing:
 .PHONY: macos-brew-extra
 macos-brew-extra:
 	@echo "== Installed, not in Brewfile (dry run, nothing is removed):"
-	brew bundle cleanup --file=$(PWD)/Brewfile || true
+	brew bundle cleanup --file=$(PWD)/Brewfile </dev/null || true
 
 .PHONY: macos-brew-diff
 macos-brew-diff: macos-brew-missing macos-brew-extra
