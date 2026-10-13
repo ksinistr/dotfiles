@@ -28,6 +28,7 @@ local ensure_installed = {
 	"zig",
 	"crystal",
 	"ocaml",
+	"koka",
 }
 
 local ts = require("nvim-treesitter")
@@ -40,22 +41,31 @@ end, {
 	desc = "Install configured Tree-sitter parsers",
 })
 
-local function register_crystal_parser()
-	require("nvim-treesitter.parsers").crystal = {
-		install_info = {
-			url = "https://github.com/crystal-lang-tools/tree-sitter-crystal",
-			generate = false,
-			generate_from_json = false,
-			queries = "queries/nvim",
-		},
-	}
+local custom_parsers = {
+	crystal = {
+		url = "https://github.com/crystal-lang-tools/tree-sitter-crystal",
+		generate = false,
+		generate_from_json = false,
+		queries = "queries/nvim",
+	},
+	koka = {
+		url = "https://github.com/koka-community/tree-sitter-koka",
+		queries = "queries",
+	},
+}
+
+local function register_custom_parsers()
+	local parsers = require("nvim-treesitter.parsers")
+	for lang, install_info in pairs(custom_parsers) do
+		parsers[lang] = { install_info = install_info }
+	end
 end
 
-register_crystal_parser()
+register_custom_parsers()
 
 vim.api.nvim_create_autocmd("User", {
 	pattern = "TSUpdate",
-	callback = register_crystal_parser,
+	callback = register_custom_parsers,
 })
 
 vim.treesitter.language.register("crystal", { "cr" })
