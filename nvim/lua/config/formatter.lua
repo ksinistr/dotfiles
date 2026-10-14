@@ -104,6 +104,10 @@ local function zigfmt()
 	return { exe = "zig", args = { "fmt", "--stdin" }, stdin = true }
 end
 
+local function gleamfmt()
+	return { exe = "gleam", args = { "format", "--stdin" }, stdin = true }
+end
+
 local function latexindent()
 	return { exe = "latexindent", args = {
 		"-g",
@@ -192,6 +196,7 @@ require("formatter").setup({
 		sql = { sleeksql },
 		sh = { shfmt },
 		zig = { zigfmt },
+		gleam = { gleamfmt },
 	},
 })
 
