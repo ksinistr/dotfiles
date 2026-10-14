@@ -3,7 +3,8 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
-    unstable.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs-nvim.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    latest.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
     home-manager.url = "github:nix-community/home-manager/release-25.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -15,7 +16,8 @@
     {
       self,
       nixpkgs,
-      unstable,
+      nixpkgs-nvim,
+      latest,
       home-manager,
       worktrunk,
       ...
@@ -25,13 +27,14 @@
         system: username:
         let
           pkgs = import nixpkgs { inherit system; };
-          unstablePkgs = import unstable { inherit system; };
+          nvimPkgs = import nixpkgs-nvim { inherit system; };
+          latestPkgs = import latest { inherit system; };
         in
         home-manager.lib.homeManagerConfiguration {
           pkgs = pkgs;
           # Make pkgs2505 available to modules (e.g., to use newer packages)
           extraSpecialArgs = {
-            inherit unstablePkgs;
+            inherit latestPkgs;
             worktrunk-pkgs = worktrunk.packages.${system};
           };
           modules = [
@@ -41,7 +44,7 @@
               {
                 programs.neovim = {
                   enable = true;
-                  package = unstablePkgs.neovim-unwrapped;
+                  package = nvimPkgs.neovim-unwrapped;
                   viAlias = true;
                   vimAlias = true;
                   withNodeJs = true;

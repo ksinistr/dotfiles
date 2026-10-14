@@ -2,7 +2,7 @@
   config,
   lib,
   pkgs,
-  unstablePkgs,
+  latestPkgs,
   ...
 }:
 
@@ -243,6 +243,7 @@ lib.mkMerge [
         openjdk
         plantuml
         graphviz
+        latestPkgs.d2
 
         # Fonts (nerdfonts option)
         nerd-fonts.iosevka-term
@@ -272,7 +273,7 @@ lib.mkMerge [
         buf
         natscli
       ]
-      # ++ [ unstablePkgs.vectorcode ]
+      # ++ [ latestPkgs.vectorcode ]
       ++ lib.optionals pkgs.stdenv.isDarwin [
         bashInteractive
         watch
