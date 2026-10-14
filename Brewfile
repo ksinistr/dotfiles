@@ -25,6 +25,7 @@ brew 'docker-completion'
 brew 'docker-compose'
 brew 'podman'
 brew 'poppler'
+brew 'gh'
 
 # from custom tap
 brew 'telepresenceio/telepresence/telepresence-oss'

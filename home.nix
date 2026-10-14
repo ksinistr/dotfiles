@@ -261,7 +261,6 @@ lib.mkMerge [
         jq
         yq-go
         htop
-        gh
         git-lfs
         grpcurl
         httpie

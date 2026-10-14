@@ -6,7 +6,7 @@ Details and manual steps: README.md
 
 Fresh Debian
   1. as root: apt-get install -y sudo git make curl && usermod -aG sudo anasyrov; re-login
-  2. make debian                        APT, Flatpak, Crystal, Go
+  2. make debian                        APT, gh, Flatpak, Crystal, Go
   3. kitty: https://sw.kovidgoyal.net/kitty/binary/
   4. Nix:   sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon
   5. make nix-linux                     Home Manager
@@ -25,7 +25,7 @@ Fresh macOS
   8. nvim
 
 Migrating a machine that had toolchains in Nix (one-off)
-  Debian: make debian-apt debian-crystal debian-go
+  Debian: make debian-apt debian-gh debian-crystal debian-go
           make nix-linux, new kitty window, make toolchains
   macOS:  make macos-brew-diff, fix Brewfile, make macos-brew
           make nix-macos, new terminal window, make toolchains
@@ -117,6 +117,14 @@ debian-apt:
 		rustup \
 		plasma-discover-backend-flatpak
 
+.PHONY: debian-gh
+debian-gh:
+	sudo mkdir -p -m 755 /etc/apt/keyrings
+	curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null
+	sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+	echo "deb [arch=$$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
+	sudo apt-get update && sudo apt-get install -y gh
+
 .PHONY: debian-crystal
 debian-crystal:
 	curl -fsSL https://crystal-lang.org/install.sh | sudo bash
@@ -162,6 +170,7 @@ python-tools:
 	command -v uv >/dev/null || { echo "uv is required"; exit 1; }
 	uv tool install --upgrade ruff
 	uv tool install --upgrade llm --with llm-anthropic
+	[ "$$(uname)" != Darwin ] || PIP_REQUIRE_VIRTUALENV=0 /usr/bin/python3 -m pip install --user --upgrade pyyaml
 
 .PHONY: go-tools
 go-tools:
@@ -178,7 +187,7 @@ go-tools:
 toolchains: rust-toolchain node python-tools go-tools
 
 .PHONY: debian
-debian: debian-sudo debian-apt debian-flatpak debian-crystal debian-go
+debian: debian-sudo debian-apt debian-gh debian-flatpak debian-crystal debian-go
 
 .PHONY: macos-brew
 macos-brew:
