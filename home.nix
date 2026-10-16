@@ -300,6 +300,13 @@ lib.mkMerge [
     #     --prefix "${npmGlobal}" -g install @anthropic-ai/claude-code
     # '';
 
+    # vim.loader validates its bytecode cache by size+mtime, and every
+    # nix store file has mtime 1, so same-size edits to the nvim config
+    # would keep running stale bytecode
+    home.activation.clearNvimLuaCache = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+      run rm -rf "${config.xdg.cacheHome}/nvim/luac"
+    '';
+
     ############################################
     # Configs (XDG)
     ############################################

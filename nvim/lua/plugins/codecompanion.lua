@@ -3,7 +3,12 @@ return {
 	dependencies = {
 		"nvim-lua/plenary.nvim",
 		"nvim-treesitter/nvim-treesitter",
-		{ "MeanderingProgrammer/render-markdown.nvim", ft = { "markdown", "codecompanion" } },
+		{
+			"MeanderingProgrammer/render-markdown.nvim",
+			ft = { "markdown", "codecompanion" },
+			-- don't duplicate heading/code icons in the sign column
+			opts = { sign = { enabled = false } },
+		},
 	},
 	opts = {
 		strategies = {

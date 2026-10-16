@@ -30,7 +30,7 @@ Migrating a machine that had toolchains in Nix (one-off)
   macOS:  make macos-brew-diff, fix Brewfile, make macos-brew
           make nix-macos, new terminal window, make toolchains
 
-Optional: make claude codex ghostty vim debian-keyd debian-kmscon debian-zsh-login-shell debian-t480-tlp
+Optional: make claude codex ghostty vim debian-keyd debian-kmscon debian-sway debian-zsh-login-shell debian-t480-tlp
 endef
 export HELP
 
@@ -86,6 +86,18 @@ debian-kmscon: debian-nerd-fonts
 	sudo ln -sf /usr/lib/systemd/system/kmsconvt@.service /etc/systemd/system/autovt@.service
 	sudo systemctl enable kmsconvt@tty1
 	@echo "Apply with: sudo systemctl restart kmsconvt@tty1 (ends the tty1 session)"
+
+# greetd on tty2 logs in to sway + fullscreen Alacritty (sway-alacritty.sh, sway/alacritty.conf).
+# Only without a desktop: greetd.service is an alias of display-manager.service.
+.PHONY: debian-sway
+debian-sway:
+	sudo apt-get install -y sway greetd
+	sudo cp $(PWD)/greetd/config.toml /etc/greetd/config.toml
+	sudo mkdir -p /etc/systemd/system/greetd.service.d
+	sudo cp $(PWD)/greetd/tty2.conf /etc/systemd/system/greetd.service.d/tty2.conf
+	sudo systemctl daemon-reload
+	sudo systemctl enable greetd
+	@echo "Apply with: sudo systemctl restart greetd (ends any tty2 session)"
 
 # Home Manager zsh as login shell (login(1) from kmscon/getty/ssh starts it). Run after make nix-linux.
 # The ~/.nix-profile symlink survives HM switches and GC, unlike a /nix/store path.

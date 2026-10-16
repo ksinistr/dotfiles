@@ -1,0 +1,9 @@
+# greetd on tty2: text login (agreety), then sway + fullscreen Alacritty (see make debian-sway).
+# tty1 keeps kmscon as the fallback console.
+[terminal]
+# switch defaults to true: greetd makes tty2 the active VT on boot
+vt = 2
+
+[default_session]
+command = "/usr/sbin/agreety --cmd /home/anasyrov/dotfiles/sway-alacritty.sh"
+user = "_greetd"
