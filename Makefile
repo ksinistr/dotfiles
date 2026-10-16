@@ -32,7 +32,7 @@ Migrating a machine that had toolchains in Nix (one-off)
 
 Optional: make claude codex ghostty vim debian-keyd debian-zsh-login-shell debian-t480-tlp
   Debian without a desktop: make debian-kmscon debian-sway    kmscon on tty1, sway + Alacritty on tty2
-  Debian with KDE:          make debian-sway-desktop          sway + Alacritty on tty2, KDE stays on boot
+  Debian with KDE:          make debian-sway-desktop          sway + Alacritty on tty7, KDE stays on boot
   Full sway session:        make debian-sway-session          pick "Sway" in SDDM
 endef
 export HELP
@@ -90,31 +90,33 @@ debian-kmscon: debian-nerd-fonts
 	sudo systemctl enable kmsconvt@tty1
 	@echo "Apply with: sudo systemctl restart kmsconvt@tty1 (ends the tty1 session)"
 
-# greetd on tty2 logs in to sway + fullscreen Alacritty (sway-alacritty.sh, sway/alacritty.conf).
+# greetd logs in to sway + fullscreen Alacritty (sway-alacritty.sh, sway/alacritty.conf).
 .PHONY: debian-sway-common
 debian-sway-common:
 	sudo apt-get install -y sway greetd
-	sudo mkdir -p /etc/systemd/system/greetd.service.d
-	sudo cp $(PWD)/greetd/tty2.conf /etc/systemd/system/greetd.service.d/tty2.conf
 
 # Without a desktop: greetd is the display manager (greetd.service is an alias of display-manager.service)
 # and switches to tty2 on boot.
 .PHONY: debian-sway
 debian-sway: debian-sway-common
+	sudo mkdir -p /etc/systemd/system/greetd.service.d
+	sudo cp $(PWD)/greetd/tty2.conf /etc/systemd/system/greetd.service.d/tty2.conf
 	sudo cp $(PWD)/greetd/config.toml /etc/greetd/config.toml
 	sudo systemctl daemon-reload
 	sudo systemctl enable greetd
 	@echo "Apply with: sudo systemctl restart greetd (ends any tty2 session)"
 
 # Next to a desktop (KDE): display-manager.service stays SDDM, so pull greetd into graphical.target directly.
-# Boot opens SDDM on tty1, Ctrl+Alt+F2 opens sway; the Plasma session lands on the next free VT (tty3).
-# Skip debian-kmscon here: kmsconvt@tty1 would fight SDDM for tty1.
+# SDDM >= 0.20 puts its greeter and the Plasma session on the first free VTs (here tty2 and tty1),
+# so greetd sits on tty7: the stock unit already expects it there, and autovt gettys stop at tty6.
+# Ctrl+Alt+F7 opens sway. Skip debian-kmscon here: kmsconvt@tty1 would fight SDDM for tty1.
 .PHONY: debian-sway-desktop
 debian-sway-desktop: debian-sway-common
+	sudo rm -f /etc/systemd/system/greetd.service.d/tty2.conf
 	sudo cp $(PWD)/greetd/config-desktop.toml /etc/greetd/config.toml
 	sudo systemctl daemon-reload
 	sudo systemctl add-wants graphical.target greetd.service
-	@echo "Apply with: sudo systemctl restart greetd (ends any tty2 session)"
+	@echo "Apply with: sudo systemctl restart greetd (ends any tty7 session)"
 
 # Full sway session (sway/config, i3status/config via Home Manager), picked as "Sway" in SDDM.
 # swaylock goes through PAM and brightnessctl through udev, so they come from APT, not Nix.

@@ -1,5 +1,5 @@
 # Full sway session, picked as "Sway" in SDDM (see make debian-sway-session); Home Manager links this directory to ~/.config/sway.
-# Based on Debian's /etc/sway/config. The tty2 session uses sway/alacritty.conf instead.
+# Based on Debian's /etc/sway/config. The greetd session uses sway/alacritty.conf instead.
 include input.conf
 
 # Super, sent by Right Alt: keyd/default.conf turns the Win keys into Mac-style Cmd

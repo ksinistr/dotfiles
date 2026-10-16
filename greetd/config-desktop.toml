@@ -1,7 +1,7 @@
-# greetd on tty2 next to a desktop: text login (agreety), then sway + fullscreen Alacritty (see make debian-sway-desktop).
-# The display manager (SDDM) keeps tty1 and the boot screen; Ctrl+Alt+F2 opens sway.
+# greetd on tty7 next to a desktop: text login (agreety), then sway + fullscreen Alacritty (see make debian-sway-desktop).
+# SDDM takes the first free VTs (greeter, Plasma) and the boot screen; Ctrl+Alt+F7 opens sway.
 [terminal]
-vt = 2
+vt = 7
 # Stay on the display manager's VT on boot
 switch = false
 
