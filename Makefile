@@ -30,7 +30,7 @@ Migrating a machine that had toolchains in Nix (one-off)
   macOS:  make macos-brew-diff, fix Brewfile, make macos-brew
           make nix-macos, new terminal window, make toolchains
 
-Optional: make claude codex ghostty vim debian-keyd debian-t480-tlp
+Optional: make claude codex ghostty vim debian-keyd debian-kmscon debian-zsh-login-shell debian-t480-tlp
 endef
 export HELP
 
@@ -61,6 +61,42 @@ debian-keyd:
 	sudo apt-get install -y keyd
 	sudo systemctl enable keyd
 	sudo systemctl restart keyd
+
+# Nerd Fonts are not packaged for Debian; system-wide copy from the release tarball (same version as nixpkgs).
+# For root services like kmscon, which don't see Home Manager fonts.
+NERD_FONTS_VERSION ?= 3.4.0
+.PHONY: debian-nerd-fonts
+debian-nerd-fonts:
+	curl -fsSLo /tmp/IosevkaTerm.tar.xz "https://github.com/ryanoasis/nerd-fonts/releases/download/v$(NERD_FONTS_VERSION)/IosevkaTerm.tar.xz"
+	sudo rm -rf /usr/local/share/fonts/IosevkaTerm
+	sudo mkdir -p /usr/local/share/fonts/IosevkaTerm
+	sudo tar -C /usr/local/share/fonts/IosevkaTerm -xJf /tmp/IosevkaTerm.tar.xz --wildcards 'IosevkaTermNerdFontMono-*.ttf'
+	rm /tmp/IosevkaTerm.tar.xz
+	sudo fc-cache -f /usr/local/share/fonts
+
+# kmscon replaces getty on the text console: TTF fonts via fontconfig (IosevkaTerm Nerd Font Mono).
+.PHONY: debian-kmscon
+debian-kmscon: debian-nerd-fonts
+	sudo apt-get install -y extrepo
+	sudo extrepo enable debian_backports
+	sudo apt-get update
+	sudo apt-get install -y -t $$(. /etc/os-release && echo $$VERSION_CODENAME)-backports kmscon
+	sudo mkdir -p /etc/kmscon
+	sudo cp $(PWD)/kmscon/kmscon.conf /etc/kmscon/kmscon.conf
+	sudo ln -sf /usr/lib/systemd/system/kmsconvt@.service /etc/systemd/system/autovt@.service
+	sudo systemctl enable kmsconvt@tty1
+	@echo "Apply with: sudo systemctl restart kmsconvt@tty1 (ends the tty1 session)"
+
+# Home Manager zsh as login shell (login(1) from kmscon/getty/ssh starts it). Run after make nix-linux.
+# The ~/.nix-profile symlink survives HM switches and GC, unlike a /nix/store path.
+# Recovery if Nix breaks: log in as root on another VT, chsh -s /bin/bash anasyrov
+ZSH_LOGIN_SHELL := $(HOME)/.nix-profile/bin/zsh
+.PHONY: debian-zsh-login-shell
+debian-zsh-login-shell:
+	test -x $(ZSH_LOGIN_SHELL)
+	grep -qxF $(ZSH_LOGIN_SHELL) /etc/shells || echo $(ZSH_LOGIN_SHELL) | sudo tee -a /etc/shells
+	[ "$$(getent passwd $$(id -un) | cut -d: -f7)" = $(ZSH_LOGIN_SHELL) ] || chsh -s $(ZSH_LOGIN_SHELL)
+	@echo "Applies on next login"
 
 # TLP saves more power than KDE's power-profiles-daemon on T480: ppd only tunes CPU EPP there,
 # TLP also powers down PCIe, USB, NVMe, Wi-Fi and audio. apt removes power-profiles-daemon (conflict).
@@ -205,6 +241,17 @@ macos-brew-extra:
 
 .PHONY: macos-brew-diff
 macos-brew-diff: macos-brew-missing macos-brew-extra
+
+# Multi-user Nix install (nix-daemon via systemd); skipped if nix is already installed
+.PHONY: debian-nix-install
+debian-nix-install:
+	@if [ -x /nix/var/nix/profiles/default/bin/nix ]; then \
+		echo "nix is already installed"; \
+	else \
+		sudo apt-get install -y curl xz-utils && \
+		curl -L https://nixos.org/nix/install | sh -s -- --daemon --yes; \
+	fi
+	@echo "Open a new shell (or: . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh), then run: make nix-linux"
 
 .PHONY: nix
 nix:
