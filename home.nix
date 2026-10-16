@@ -186,7 +186,14 @@ lib.mkMerge [
     programs.git = {
       enable = true;
       userName = "Artur Nasyrov";
-      userEmail = builtins.getEnv "GIT_AUTHOR_EMAIL";
+      userEmail =
+        let
+          envEmail = builtins.getEnv "GIT_AUTHOR_EMAIL";
+        in
+        if envEmail == "" && pkgs.stdenv.isLinux then
+          "63094252+ksinistr@users.noreply.github.com"
+        else
+          envEmail;
       extraConfig = {
         init.defaultBranch = "main";
         core.editor = "nvim";
