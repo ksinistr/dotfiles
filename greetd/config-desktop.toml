@@ -1,0 +1,10 @@
+# greetd on tty2 next to a desktop: text login (agreety), then sway + fullscreen Alacritty (see make debian-sway-desktop).
+# The display manager (SDDM) keeps tty1 and the boot screen; Ctrl+Alt+F2 opens sway.
+[terminal]
+vt = 2
+# Stay on the display manager's VT on boot
+switch = false
+
+[default_session]
+command = "/usr/sbin/agreety --cmd /home/anasyrov/dotfiles/sway-alacritty.sh"
+user = "_greetd"

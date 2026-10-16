@@ -6,31 +6,34 @@ Details and manual steps: README.md
 
 Fresh Debian
   1. as root: apt-get install -y sudo git make curl && usermod -aG sudo anasyrov; re-login
-  2. make debian                        APT, gh, Flatpak, Crystal, Go
-  3. kitty: https://sw.kovidgoyal.net/kitty/binary/
-  4. Nix:   sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon
-  5. make nix-linux                     Home Manager
-  6. re-login, open kitty               zsh picks up the new PATH
-  7. make toolchains                    Rust, Node, Python/Go tools
-  8. nvim                               Mason installs language servers
+  2. make debian                        APT (incl. Alacritty), gh, Flatpak, Crystal, Go
+  3. Nix:   sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon
+  4. make nix-linux                     Home Manager
+  5. re-login, open Alacritty           zsh picks up the new PATH
+  6. make toolchains                    Rust, Node, Python/Go tools
+  7. nvim                               Mason installs language servers
 
 Fresh macOS
   1. xcode-select --install; Homebrew: https://brew.sh
   2. make macos-brew                    Brewfile
-  3. kitty: https://sw.kovidgoyal.net/kitty/binary/
+  3. Alacritty: .dmg from https://github.com/alacritty/alacritty/releases/latest, then
+            xattr -dr com.apple.quarantine /Applications/Alacritty.app
   4. Nix:   sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install)
   5. make nix-macos                     Home Manager
-  6. new terminal window
+  6. new Alacritty window
   7. make toolchains
   8. nvim
 
 Migrating a machine that had toolchains in Nix (one-off)
   Debian: make debian-apt debian-gh debian-crystal debian-go
-          make nix-linux, new kitty window, make toolchains
+          make nix-linux, new Alacritty window, make toolchains
   macOS:  make macos-brew-diff, fix Brewfile, make macos-brew
           make nix-macos, new terminal window, make toolchains
 
-Optional: make claude codex ghostty vim debian-keyd debian-kmscon debian-sway debian-zsh-login-shell debian-t480-tlp
+Optional: make claude codex ghostty vim debian-keyd debian-zsh-login-shell debian-t480-tlp
+  Debian without a desktop: make debian-kmscon debian-sway    kmscon on tty1, sway + Alacritty on tty2
+  Debian with KDE:          make debian-sway-desktop          sway + Alacritty on tty2, KDE stays on boot
+  Full sway session:        make debian-sway-session          pick "Sway" in SDDM
 endef
 export HELP
 
@@ -88,16 +91,37 @@ debian-kmscon: debian-nerd-fonts
 	@echo "Apply with: sudo systemctl restart kmsconvt@tty1 (ends the tty1 session)"
 
 # greetd on tty2 logs in to sway + fullscreen Alacritty (sway-alacritty.sh, sway/alacritty.conf).
-# Only without a desktop: greetd.service is an alias of display-manager.service.
-.PHONY: debian-sway
-debian-sway:
+.PHONY: debian-sway-common
+debian-sway-common:
 	sudo apt-get install -y sway greetd
-	sudo cp $(PWD)/greetd/config.toml /etc/greetd/config.toml
 	sudo mkdir -p /etc/systemd/system/greetd.service.d
 	sudo cp $(PWD)/greetd/tty2.conf /etc/systemd/system/greetd.service.d/tty2.conf
+
+# Without a desktop: greetd is the display manager (greetd.service is an alias of display-manager.service)
+# and switches to tty2 on boot.
+.PHONY: debian-sway
+debian-sway: debian-sway-common
+	sudo cp $(PWD)/greetd/config.toml /etc/greetd/config.toml
 	sudo systemctl daemon-reload
 	sudo systemctl enable greetd
 	@echo "Apply with: sudo systemctl restart greetd (ends any tty2 session)"
+
+# Next to a desktop (KDE): display-manager.service stays SDDM, so pull greetd into graphical.target directly.
+# Boot opens SDDM on tty1, Ctrl+Alt+F2 opens sway; the Plasma session lands on the next free VT (tty3).
+# Skip debian-kmscon here: kmsconvt@tty1 would fight SDDM for tty1.
+.PHONY: debian-sway-desktop
+debian-sway-desktop: debian-sway-common
+	sudo cp $(PWD)/greetd/config-desktop.toml /etc/greetd/config.toml
+	sudo systemctl daemon-reload
+	sudo systemctl add-wants graphical.target greetd.service
+	@echo "Apply with: sudo systemctl restart greetd (ends any tty2 session)"
+
+# Full sway session (sway/config, i3status/config via Home Manager), picked as "Sway" in SDDM.
+# swaylock goes through PAM and brightnessctl through udev, so they come from APT, not Nix.
+.PHONY: debian-sway-session
+debian-sway-session:
+	sudo apt-get install -y sway swaylock swayidle i3status fuzzel mako-notifier grim slurp brightnessctl \
+		pipewire-audio xdg-desktop-portal-wlr xdg-desktop-portal-gtk
 
 # Home Manager zsh as login shell (login(1) from kmscon/getty/ssh starts it). Run after make nix-linux.
 # The ~/.nix-profile symlink survives HM switches and GC, unlike a /nix/store path.

@@ -458,8 +458,11 @@ lib.mkMerge [
     # home.packages = [ pkgs.wl-clipboard ];
     xdg.configFile = {
       "keyd/default.conf".source = ./keyd/default.conf;
+      # Whole directory: sway/config includes input.conf by a relative path
+      "sway".source = ./sway;
+      "i3status/config".source = ./i3status/config;
       "xdg-terminals.list".text = ''
-        kitty.desktop
+        Alacritty.desktop
       '';
       # XKB option: CapsLock becomes Ctrl
       "kxkbrc".text = ''
@@ -482,7 +485,7 @@ lib.mkMerge [
       GOBIN = "${config.home.homeDirectory}/go/bin";
       GOCACHE = "${config.home.homeDirectory}/.cache/go-build";
 
-      TERMINAL = "kitty";
+      TERMINAL = "alacritty";
     };
   })
 

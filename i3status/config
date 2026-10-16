@@ -1,0 +1,37 @@
+# Status line for swaybar (sway/config). See i3status(1).
+general {
+    colors = true
+    interval = 5
+}
+
+order += "wireless _first_"
+order += "ethernet _first_"
+order += "battery all"
+order += "volume master"
+order += "tztime local"
+
+wireless _first_ {
+    format_up = "W: %essid %quality"
+    format_down = "W: down"
+}
+
+ethernet _first_ {
+    format_up = "E: %ip"
+    format_down = ""
+}
+
+battery all {
+    format = "%status %percentage %remaining"
+    integer_battery_capacity = true
+    last_full_capacity = true
+    low_threshold = 10
+}
+
+volume master {
+    format = "♪ %volume"
+    format_muted = "♪ muted"
+}
+
+tztime local {
+    format = "%Y-%m-%d %H:%M"
+}

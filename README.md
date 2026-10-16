@@ -12,7 +12,7 @@ Everything installs bottom-up; each layer needs the one below it. Which package 
 | 2. Home Manager | configs, CLI tools, `uv`, `fnm`, PATH | `make nix-linux` / `make nix-macos` |
 | 3. Toolchains | Rust, Node, Python/Go tools | `make toolchains` |
 
-Layer 3 needs a new zsh session after layer 2: Home Manager sets PATH and environment only when a shell starts. On Debian the login shell is bash, so open kitty (it starts zsh) or run `zsh -l`.
+Layer 3 needs a new zsh session after layer 2: Home Manager sets PATH and environment only when a shell starts. On Debian the login shell is bash, so open Alacritty (it starts zsh) or run `zsh -l`.
 
 ## Fresh install
 
@@ -21,13 +21,12 @@ Layer 3 needs a new zsh session after layer 2: Home Manager sets PATH and enviro
 1. As root (`su -`): `apt-get install -y sudo git make curl && usermod -aG sudo anasyrov`, then log out and back in.
 2. `git clone https://github.com/ksinistr/dotfiles.git ~/dotfiles && cd ~/dotfiles`
 3. `make debian`: APT packages, Flatpak apps, Crystal, Go. Optionally `make debian-keyd`; on a ThinkPad T480 `make debian-t480-tlp`.
-4. Install kitty following the official guide, including its desktop integration step: https://sw.kovidgoyal.net/kitty/binary/. Ghostty comes from a `.deb` installed by hand.
-5. Install Nix: `sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon`, then open a new terminal.
-6. `make nix-linux`
-7. Log out and back in, open kitty.
-8. `make toolchains`
-9. Open `nvim` and let Mason install the language servers.
-10. Optionally `make claude codex ghostty vim`.
+4. Install Nix: `sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install) --daemon`, then open a new terminal.
+5. `make nix-linux`
+6. Log out and back in, open Alacritty.
+7. `make toolchains`
+8. Open `nvim` and let Mason install the language servers.
+9. Optionally `make claude codex ghostty vim`. Ghostty itself comes from a `.deb` installed by hand.
 
 ### macOS
 
@@ -35,10 +34,10 @@ Layer 3 needs a new zsh session after layer 2: Home Manager sets PATH and enviro
 2. Install Homebrew (https://brew.sh) and add `eval "$(/opt/homebrew/bin/brew shellenv)"` to `~/.zprofile`.
 3. `git clone https://github.com/ksinistr/dotfiles.git ~/dotfiles && cd ~/dotfiles`
 4. `make macos-brew`
-5. Install kitty following the official guide: https://sw.kovidgoyal.net/kitty/binary/
+5. Install Alacritty from the `.dmg` on https://github.com/alacritty/alacritty/releases/latest (the Homebrew cask is disabled: the app is not notarized). Copy it to `/Applications`, then `xattr -dr com.apple.quarantine /Applications/Alacritty.app` so Gatekeeper lets it start.
 6. Install Nix: `sh <(curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install)`, then open a new terminal.
 7. `make nix-macos`
-8. Open a new terminal window.
+8. Open a new Alacritty window.
 9. `make toolchains`
 10. Open `nvim` and let Mason install the language servers.
 11. Optionally `make claude codex ghostty vim`.
@@ -51,7 +50,7 @@ One-off; delete this section, and its block in `make help`, once both machines a
 
 1. `make debian-apt debian-crystal debian-go`
 2. `make nix-linux`
-3. Open a new kitty window. `echo $GOROOT` must print nothing and `which go` must show `/usr/local/go/bin/go`; otherwise log out and back in.
+3. Open a new Alacritty window. `echo $GOROOT` must print nothing and `which go` must show `/usr/local/go/bin/go`; otherwise log out and back in.
 4. `make toolchains`
 5. Open `nvim` and let Mason install pylsp.
 
