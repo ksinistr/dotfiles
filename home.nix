@@ -150,6 +150,11 @@ lib.mkMerge [
           unset name value
         ''}
         ${lib.optionalString pkgs.stdenv.isLinux ''
+          # Headless logins don't inherit the systemd user env where ssh-agent.socket sets this
+          if [[ -z $SSH_AUTH_SOCK && -S $XDG_RUNTIME_DIR/openssh_agent ]]; then
+            export SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/openssh_agent
+          fi
+
           if command -v secret-tool >/dev/null 2>&1; then
             for name in $(secret-tool search --all service env 2>&1 >/dev/null | sed -n 's/^attribute\.name = \([A-Za-z_][A-Za-z0-9_]*\)$/\1/p'); do
               value=$(secret-tool lookup service env name "$name" 2>/dev/null) && export "$name=$value"
