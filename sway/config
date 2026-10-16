@@ -2,6 +2,7 @@
 # Based on Debian's /etc/sway/config. The tty2 session uses sway/alacritty.conf instead.
 include input.conf
 
+# Super, sent by Right Alt: keyd/default.conf turns the Win keys into Mac-style Cmd
 set $mod Mod4
 set $left h
 set $down j
