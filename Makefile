@@ -30,7 +30,7 @@ Migrating a machine that had toolchains in Nix (one-off)
   macOS:  make macos-brew-diff, fix Brewfile, make macos-brew
           make nix-macos, new terminal window, make toolchains
 
-Optional: make claude codex ghostty vim debian-keyd debian-zsh-login-shell debian-t480-tlp
+Optional: make claude ghostty vim debian-keyd debian-zsh-login-shell debian-t480-tlp
   Debian without a desktop: make debian-kmscon debian-sway    kmscon on tty1, sway + Alacritty on tty2
   Debian with KDE:          make debian-sway-desktop          sway + Alacritty on tty7, KDE stays on boot
   Full sway session:        make debian-sway-session          pick "Sway" in SDDM
@@ -313,16 +313,3 @@ claude:
 	cp ~/.claude/settings.json ~/.claude/settings.json.bak
 	ln -sf $(PWD)/claude/statusline-command.sh ~/.claude/statusline-command.sh
 	jq -s '.[0] + .[1]' ~/.claude/settings.json.bak $(PWD)/claude/settings.json > ~/.claude/settings.json
-
-CODEX_DIR ?= $(if $(CODEX_HOME),$(CODEX_HOME),$(HOME)/.codex)
-
-.PHONY: codex
-codex:
-	command -v jq >/dev/null || { echo "jq is required"; exit 1; }
-	command -v codex >/dev/null || { echo "codex is required"; exit 1; }
-	command -v perl >/dev/null || { echo "perl is required"; exit 1; }
-	mkdir -p "$(CODEX_DIR)/hooks"
-	for f in "$(PWD)"/codex/hooks/*.sh; do ln -sf "$$f" "$(CODEX_DIR)/hooks/"; done
-	[ -f "$(CODEX_DIR)/hooks.json" ] || echo '{}' > "$(CODEX_DIR)/hooks.json"
-	cp "$(CODEX_DIR)/hooks.json" "$(CODEX_DIR)/hooks.json.bak"
-	jq -s '.[0] * .[1]' "$(CODEX_DIR)/hooks.json.bak" "$(PWD)/codex/hooks.json" > "$(CODEX_DIR)/hooks.json"

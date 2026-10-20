@@ -26,7 +26,7 @@ Layer 3 needs a new zsh session after layer 2: Home Manager sets PATH and enviro
 6. Log out and back in, open Alacritty.
 7. `make toolchains`
 8. Open `nvim` and let Mason install the language servers.
-9. Optionally `make claude codex ghostty vim`. Ghostty itself comes from a `.deb` installed by hand.
+9. Optionally `make claude ghostty vim`. Ghostty itself comes from a `.deb` installed by hand.
 
 ### macOS
 
@@ -40,7 +40,7 @@ Layer 3 needs a new zsh session after layer 2: Home Manager sets PATH and enviro
 8. Open a new Alacritty window.
 9. `make toolchains`
 10. Open `nvim` and let Mason install the language servers.
-11. Optionally `make claude codex ghostty vim`.
+11. Optionally `make claude ghostty vim`.
 
 ## Migrating a machine that had toolchains in Nix
 
