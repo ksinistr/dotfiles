@@ -438,6 +438,14 @@ lib.mkMerge [
             family = terminalFontName;
             style = "Regular";
           };
+          italic = {
+            family = terminalFontName;
+            style = "Italic";
+          };
+          bold_italic = {
+            family = terminalFontName;
+            style = "Bold Italic";
+          };
         };
       };
     };
