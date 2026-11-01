@@ -8,9 +8,14 @@
 --   codestral:22b                      ~13GB, strong FIM, heavy, non-commercial license
 --   starcoder2:7b / starcoder2:15b     ~4GB / ~9GB, older alternative
 --   codegemma:7b-code                  ~5GB, older alternative
+local providers = {
+	ollama = "openai_fim_compatible",
+	mistral = "codestral",
+}
+
 require("minuet").setup({
 	notify = "warn",
-	provider = "openai_fim_compatible",
+	provider = providers[vim.env.AI_COMPLETION_PROVIDER] or "openai_fim_compatible",
 	context_window = 1024,
 	n_completions = 1,
 	add_single_line_entry = false,
@@ -23,6 +28,12 @@ require("minuet").setup({
 			optional = {
 				max_tokens = 128,
 				top_p = 0.9,
+				stop = { "\n\n" },
+			},
+		},
+		codestral = {
+			optional = {
+				max_tokens = 128,
 				stop = { "\n\n" },
 			},
 		},

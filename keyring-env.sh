@@ -2,7 +2,7 @@
 set -euo pipefail
 
 usage() {
-  echo "usage: keyring-env add NAME | ls" >&2
+  echo "usage: keyring-env add NAME | list | ls" >&2
   exit 1
 }
 
@@ -19,6 +19,6 @@ add() {
 
 case "${1:-}" in
   add) [[ $# -eq 2 ]] || usage; add "$2" ;;
-  ls) [[ $# -eq 1 ]] || usage; names ;;
+  list|ls) [[ $# -eq 1 ]] || usage; names ;;
   *) usage ;;
 esac
