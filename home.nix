@@ -259,7 +259,8 @@ lib.mkMerge [
 
         # Fonts (nerdfonts option)
         nerd-fonts.iosevka-term
-        nerd-fonts.fira-mono
+        nerd-fonts.fira-code
+        nerd-fonts.inconsolata
         nerd-fonts.jetbrains-mono
 
         # Zsh git prompt
@@ -284,6 +285,8 @@ lib.mkMerge [
         apktool
         buf
         natscli
+
+        tokei
       ]
       # ++ [ latestPkgs.vectorcode ]
       ++ lib.optionals pkgs.stdenv.isDarwin [

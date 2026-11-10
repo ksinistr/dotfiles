@@ -52,3 +52,18 @@ vim.lsp.enable("zls")
 vim.lsp.enable("crystalline")
 vim.lsp.enable('ocamllsp')
 vim.lsp.enable('gleam')
+
+-- Step 1: register the Crystal filetype if Neovim does not detect it.
+vim.filetype.add({
+  extension = {
+    cr = 'crystal',
+  },
+})
+
+-- Step 2: configure and enable Lattice.
+vim.lsp.config('lattice', {
+  cmd          = { vim.fn.expand('~/.local/bin/lattice') },
+  filetypes    = { 'crystal' },
+  root_markers = { 'shard.yml', '.git' },
+})
+vim.lsp.enable('lattice')

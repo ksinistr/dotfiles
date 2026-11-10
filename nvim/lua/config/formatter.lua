@@ -123,6 +123,10 @@ local function sleeksql()
 	}
 end
 
+local function crystalfmt()
+	return { exe = "crystal", args = { "tool", "format", "-" }, stdin = true }
+end
+
 local util = require("formatter.util")
 
 require("formatter").setup({
@@ -197,6 +201,7 @@ require("formatter").setup({
 		sh = { shfmt },
 		zig = { zigfmt },
 		gleam = { gleamfmt },
+		crystal = { crystalfmt },
 	},
 })
 

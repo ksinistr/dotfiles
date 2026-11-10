@@ -118,7 +118,7 @@ require("codecompanion").setup({
 					},
 					schema = {
 						model = {
-							default = "openai/gpt-5.6-luna-pro:nitro",
+							default = "~z-ai/glm-latest",
 							choices = {
 								"google/gemini-3.8-flash",
 								"minimax/minimax-m3",

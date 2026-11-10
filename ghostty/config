@@ -1,5 +1,22 @@
 font-family = JetBrains Mono
-font-size = 11
+font-size = 12
 window-save-state = always
 quit-after-last-window-closed = true
 command = /home/anasyrov/.nix-profile/bin/zsh --login
+# 1. Skip heavy GTK initialization when opening new windows
+# Ghostty will use a single running instance for instant window respawning.
+gtk-single-instance = true
+
+# 2. Optimize rendering performance for Wayland
+# Disable background blur if enabled — on UHD 620 at 2K, it is the main FPS killer.
+background-opacity = 1.0
+background-blur = false
+
+# 3. Configure buffering to reduce input lag
+# Allows the Intel graphics chip to process frames faster
+window-vsync = true
+
+# 4. Optimize font rendering
+# Disabling blurred font thickening and excessive antialiasing
+# reduces the load on the GPU texture atlas when generating new colored glyphs.
+font-thicken = false
